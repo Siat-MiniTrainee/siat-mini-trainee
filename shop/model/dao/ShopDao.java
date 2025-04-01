@@ -1,6 +1,6 @@
 package shop.model.dao;
 
-import util.JDBCUtil;
+import common.util.JDBCUtil;
 
 public class ShopDao {
     private static volatile ShopDao instance = new ShopDao();

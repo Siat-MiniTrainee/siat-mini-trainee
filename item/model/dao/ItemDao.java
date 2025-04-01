@@ -1,6 +1,6 @@
 package item.model.dao;
 
-import util.JDBCUtil;
+import common.util.JDBCUtil;
 
 public class ItemDao {
     private static volatile ItemDao instance = new ItemDao();

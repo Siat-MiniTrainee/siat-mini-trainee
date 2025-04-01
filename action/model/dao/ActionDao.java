@@ -1,6 +1,6 @@
 package action.model.dao;
 
-import util.JDBCUtil;
+import common.util.JDBCUtil;
 
 public class ActionDao {
     private static volatile ActionDao instance = new ActionDao();

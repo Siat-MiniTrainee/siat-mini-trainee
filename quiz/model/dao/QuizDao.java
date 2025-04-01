@@ -1,6 +1,6 @@
 package quiz.model.dao;
 
-import util.JDBCUtil;
+import common.util.JDBCUtil;
 
 public class QuizDao {
     private static volatile QuizDao instance = new QuizDao();

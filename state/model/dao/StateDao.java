@@ -1,6 +1,6 @@
 package state.model.dao;
 
-import util.JDBCUtil;
+import common.util.JDBCUtil;
 
 public class StateDao {
     private static volatile StateDao instance = new StateDao();
