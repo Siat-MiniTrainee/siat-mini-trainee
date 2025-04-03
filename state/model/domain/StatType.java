@@ -1,9 +1,11 @@
 package state.model.domain;
 
 public enum StatType {
+    HP,
+    MP,
     STRENGTH,
     INTELLIGENCE,
     MONEY,
-    HP,
-    MP;
+    MAX_HP,
+    MAX_MP;
 }

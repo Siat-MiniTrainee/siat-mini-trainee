@@ -12,7 +12,6 @@ import lombok.ToString;
 public class QuizDto {
     private int quizId;
     private String content;
-    private String answer;
-    private String explanation;
+    private QuizType quizType;
     private int level;
 }
