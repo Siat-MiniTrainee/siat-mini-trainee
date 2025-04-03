@@ -10,6 +10,7 @@ import common.factory.BeanFactory;
 import item.model.domain.InventoryItemDto;
 import item.model.domain.ItemInfoDto;
 import item.model.domain.ItemUseDto;
+import quiz.controller.QuizController;
 import quiz.model.domain.QuizConfirmResponseDto;
 import quiz.model.domain.QuizDto;
 import quiz.model.domain.QuizResponseDto;
@@ -135,39 +136,32 @@ public class FrontController {
     }
     public List<QuizDto> getQuizInfoList(int playerId){
         
-        return null;
+        return List.of();
     }
     public List<QuizDto> getQuizInfoList(int playerId,int level){
         
-        return null;
+        return List.of();
     }
     public List<QuizDto> getQuizInfoList(int level, QuizType type){
-        
-        return null;
+        QuizController quizController = (QuizController) factory.getCtrl("quiz");
+        return quizController.getQuizListByDifficulty(level,type);
     }
 
     public QuizConfirmResponseDto confirmQuiz(int quizId, String answer) {
-
-        return QuizConfirmResponseDto.builder()
-        .result("정답")
-        .explanation("문제는 이러이러함")
-        .answer("정답은 이거임")
-        .quizType(QuizType.JAVA)
-        .level(1)
-        .build();
+        QuizController quizController = (QuizController) factory.getCtrl("quiz");
+        return quizController.confirmQuiz(quizId, answer);
     }    
-    public QuizResponseDto submitQuizResult(int playerId, int quizLevel){
-        StateUpdateInfoDto stateChange = StateUpdateInfoDto.builder()
-            .hp(0)
-            .mp(0)
-            .money(100)
-            .intelligence(5)
-            .strength(0)
-            .build();
-        return QuizResponseDto.builder()
-        .result("퀴즈성공")
-        .stateChange(stateChange)
-        .build();
+
+    public QuizResponseDto submitQuizResult(int playerId, int quizLevel, String result){
+        QuizController quizController = (QuizController) factory.getCtrl("quiz");
+        // StateUpdateInfoDto stateChange = StateUpdateInfoDto.builder()
+        //     .hp(0)
+        //     .mp(0)
+        //     .money(100)
+        //     .intelligence(5)
+        //     .strength(0)
+        //     .build();
+        return quizController.submitQuizResult(playerId, quizLevel, result);
     }
    
 }
