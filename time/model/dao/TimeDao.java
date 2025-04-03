@@ -18,8 +18,30 @@ public class TimeDao {
     private TimeDao() {
         db = JDBCUtil.getInstance();
     }
+
     public static TimeDao getInstance() {
         return instance;
+    }
+
+    public int insertPlayerTime(int playerId, int initTime) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        String sql = "INSERT INTO PLAYER_TIME (PLAYER_ID, PLAYER_TIME) VALUES(?,?)";
+        int idx = 1;
+        int result = 0;
+        try {
+            conn = db.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(idx++, playerId);
+            pstmt.setInt(idx++, initTime);
+            result = pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            db.close(rset, pstmt, conn);
+        }
+        return result;
     }
     public int getPlayerTime(int playerId) {
         Connection conn = null;

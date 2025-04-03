@@ -10,15 +10,18 @@ import state.model.dao.StateDao;
 import state.model.domain.StateResponseDto;
 import state.model.domain.StateUpdateInfoDto;
 import state.model.domain.StateUpdateRequestDto;
+import time.service.TimeService;
 
 public class StateService {
     private static volatile StateService instance = new StateService();
     private StateDao stateDao;
     private ItemService itemService;
+    private TimeService timeService;
 
     private StateService() {
         stateDao=StateDao.getInstance();
-        itemService=ItemService.getInstance();
+        itemService = ItemService.getInstance();
+        timeService = TimeService.getInstance();
     }
 
     public static StateService getInstance() {
@@ -44,14 +47,16 @@ public class StateService {
         // 데이터베이스에 새 플레이어 기록을 삽입
         int playerId = stateDao.insertPlayer(newPlayer);
         
-        if(playerId!=-1){
+        if (playerId >= -1) {
             newPlayer.setPlayerId(playerId);
-            
+
             int playerDetailResult = stateDao.insertPlayerDetail(newPlayer);
-            if(playerDetailResult>0){
+            int playerTimeInitResult = timeService.createPlayerTime(playerId, 0);
+            if (playerDetailResult > 0 && playerTimeInitResult>0) {
                 return Optional.of(newPlayer);
             }
         }
+        
         return Optional.empty();
     }
 
