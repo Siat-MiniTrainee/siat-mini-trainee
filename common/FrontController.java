@@ -3,6 +3,7 @@ package common;
 import java.util.ArrayList;
 import java.util.List;
 
+import action.controller.ActionController;
 import action.model.domain.ActionResponseDto;
 import action.model.domain.ActionType;
 import common.factory.BeanFactory;
@@ -65,18 +66,19 @@ public class FrontController {
     
     public ActionResponseDto doAction(int playerId, ActionType actionType) {
 
-        StateUpdateInfoDto stateChange = StateUpdateInfoDto.builder()
-            .hp(-10)
-            .mp(-5)
-            .money(0)
-            .intelligence(2)
-            .strength(3)
-            .build();
-
-        return ActionResponseDto.builder()
-            .result("Action Successful")
-            .stageChange(stateChange)
-            .build();
+        // StateUpdateInfoDto stateChange = StateUpdateInfoDto.builder()
+        //     .hp(-10)
+        //     .mp(-5)
+        //     .money(0)
+        //     .intelligence(2)
+        //     .strength(3)
+        //     .build();
+        ActionController actionController = (ActionController) factory.getCtrl("action");
+        ActionResponseDto actionResult = actionController.doAction(playerId, actionType);
+        if (actionResult.getResult().equals("성공")) {
+            actionResult.setResult("Action Successful");
+        }
+        return actionResult;
     }
     
     public int getTime(int playerId){
