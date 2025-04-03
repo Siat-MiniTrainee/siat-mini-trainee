@@ -9,10 +9,10 @@ public class TraineeView {
     }
 
 
-    public void mainLoop () {
+    public void exec () {
+        inputbox("개발자 생성", "이름을 입력하세요.");
         while (true) {
             int userChoice = mainMenu();
-            
             switch (userChoice) {
                 case 1:
                     studyMenu();
@@ -21,13 +21,16 @@ public class TraineeView {
                     exerciseMenu();
                     break;
                 case 3:
+                    workMenu();
+                    break;
+                case 4:
                     restMenu();
                     break;
                 case 7:
-                    shopMenu();
+                    shopLoop();
                     break;
                 case 8:
-                    inventoryMenu();
+                    inventoryLoop();
                     break;
                 case 0:
                     System.out.println("종료합니다.");
@@ -39,50 +42,95 @@ public class TraineeView {
         }
     }
 
-    public int shopMenu() {
+    public void shopLoop() {
 
-        String title = "상점";
+        while (true) {
 
-        clear();
-        printBanner(title, 1);
-        margin();
-        System.out.println("[ 아이템 목록 ]");
-        margin();
-        return inputInt();
+            String title = "상점";
+
+            clear();
+            System.out.println(AsciiArts.artShop);
+            margin();
+            System.out.println("[ 아이템 목록 ]");
+            margin();
+            System.out.println("  0. 뒤로");
+
+            int userChoice = inputInt();
+            switch (userChoice) {
+                case 0:
+                    return;
+            
+                default:
+                    break;
+            }
+        }
     }
 
-    public int inventoryMenu() {
+    public void inventoryLoop() {
+        while (true) {
 
-        String title = "소지품";
+            String title = "소지품";
 
-        clear();
-        printBanner(title, 1);
-        margin();
-        System.out.println("[ 아이템 목록 ]");
-        margin();
-        return inputInt();
+            clear();
+            printBanner(title);
+            margin();
+            System.out.println("[ 아이템 목록 ]");
+            margin();
+            System.out.println("  0. 뒤로");
+
+            int userChoice = inputInt();
+            switch (userChoice) {
+                case 0:
+                    return;
+            
+                default:
+                    break;
+            }
+        }
     }
 
 
     public void studyMenu() {
         int userChoice = ynMessagebox("공부", 
-        "정말로 공부하시겠습니까? (Y/N)\r",
+        "공부하시겠습니까? (Y/N)\r",
         1);
         if (userChoice == 1) {
             messagebox("공부 완료 메시지", "대충 내용");
+            quizMenu();
         }
+    }
+
+    public void quizMenu() {
+        clear();
+        divider();
+        System.out.println(AsciiArts.artQuiz);
+        String area = "파이썬";
+        String difficulty = "3";
+        String content = "대충 문제";
+
+        System.out.println("범위: "+area+"난이도: "+difficulty);
+        margin();
+        System.out.println(content);
+        margin();
+
+        inputInt();
     }
 
     public void exerciseMenu() {
         int userChoice = ynMessagebox("운동", 
-        "정말로 운동하시겠습니까? (Y/N)\r",
+        "운동하시겠습니까? (Y/N)\r",
         2);
     }
 
     public void restMenu() {
         int userChoice = ynMessagebox("휴식", 
-        "정말로 휴식하시겠습니까? (Y/N)\r",
+        "휴식하시겠습니까? (Y/N)\r",
         3);
+    }
+
+    public void workMenu() {
+        int userChoice = ynMessagebox("알바", 
+        "알바하시겠습니까? (Y/N)\r");
     }
 
     public int mainMenu() {
@@ -129,6 +177,7 @@ public class TraineeView {
                 System.out.println(AsciiArts.artSofa);
                 break;
             default:
+                margin();
                 break;
         }
 
@@ -147,9 +196,23 @@ public class TraineeView {
     public void messagebox(String title, String content) {
         clear();
         divider();
+        margin();
         System.out.println("[ "+title+" ]");
+        margin();
         System.out.println(content);
+        margin();
         inputEnter();
+    }
+
+    public String inputbox(String title, String content) {
+        clear();
+        divider();
+        margin();
+        System.out.println("[ "+title+" ]");
+        margin();
+        System.out.println(content);
+        margin();
+        return inputString();
     }
 
     public void printBanner(String title) {
@@ -183,29 +246,27 @@ public class TraineeView {
     }
 
     public void printStats() {
+
+        int temp = 0;
         System.out.println("[ 상태 ]");
         margin();
-        System.out.println("  체  력 : ");
-        System.out.println("  체신력 : ");
-        System.out.println("  지  능 : ");
-        System.out.println("  힘     : ");
-        System.out.println("  허  기 : ");
-        System.out.println("  소지금 : ");
+        System.out.println("  체  력 : "+ temp);
+        System.out.println("  정신력 : "+ temp);
+        System.out.println("  지  능 : "+ temp);
+        System.out.println("  힘     : "+ temp);
+        System.out.println("  허  기 : "+ temp);
+        System.out.println("  소지금 : "+ temp);
 
     }
 
     public void printActions() {
-        System.out.println("[ 행동 선택 ]");
+        System.out.println("[ 행동 선택 ]              [ 메뉴 ]");
         margin();
-        System.out.println("  1. 공부");
-        System.out.println("  2. 운동");
-        System.out.println("  3. 휴식");
-
-        System.out.println("[ 메뉴 ]");
+        System.out.println("  1. 공부                    7. 상점");
+        System.out.println("  2. 운동                    8. 소지품");
+        System.out.println("  3. 알바                    0. 종료");
+        System.out.println("  4. 휴식");
         margin();
-        System.out.println("  7. 상점");
-        System.out.println("  8. 소지품");
-        System.out.println("  0. 종료");
     }
 
     public void divider() {
