@@ -20,6 +20,7 @@ import state.controller.StateController;
 import state.model.domain.StateResponseDto;
 import state.model.domain.StateUpdateInfoDto;
 import state.model.domain.StateUpdateRequestDto;
+import time.controller.TimeController;
 
 public class FrontController {
     private static FrontController instance = new FrontController();
@@ -83,15 +84,17 @@ public class FrontController {
     }
     
     public int getTime(int playerId){
-        
-        return 4;
+        TimeController timeController = (TimeController) factory.getCtrl("time");
+        return timeController.getTime(playerId);
     }
     
-    public List<ItemInfoDto> getShopItemList(int playerId){
+    public List<ItemInfoDto> getShopItemList(int playerId) {
         return null;
     }
     
-    public void updateTime(int playerId){
+    public int updateTime(int playerId) {
+        TimeController timeController = (TimeController) factory.getCtrl("time");
+        return timeController.updateTime(playerId);
     }
     
     public List<ItemInfoDto> getShopOrderList(int playerId, ShopItemFilterDto filterCriteria) {
