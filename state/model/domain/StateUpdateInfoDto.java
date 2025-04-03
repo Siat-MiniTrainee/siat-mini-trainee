@@ -1,3 +1,4 @@
+
 package state.model.domain;
 
 import lombok.Builder;
@@ -9,13 +10,10 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
-public class StateResponseDto {
-    private double playerId;
+public class StateUpdateInfoDto {
     private double hp;
     private double mp;
-    private double maxHp;
-    private double maxMp;
+    private double money;
     private double intelligence;
     private double strength;
-    private double money;
 }

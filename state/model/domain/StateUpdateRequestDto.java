@@ -8,9 +8,12 @@ import lombok.Setter;
 @Setter
 @Builder
 public class StateUpdateRequestDto {
-    private int playerId;
-    private int hp;
-    private int mp;
-    private int intelligence;
-    private int strength;
+    private double playerId;
+    private double hp;
+    private double mp;
+    private double maxHp;
+    private double maxMp;
+    private double intelligence;
+    private double strength;
+    private double money;
 }

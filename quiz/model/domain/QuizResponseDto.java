@@ -1,4 +1,4 @@
-package action.model.domain;
+package quiz.model.domain;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,8 +10,7 @@ import state.model.domain.StateUpdateInfoDto;
 @Setter
 @Builder
 @ToString
-public class ActionResponseDto {
+public class QuizResponseDto {
     private String result;
-    private String actionName;
-    private StateUpdateInfoDto stageChange;
+    private StateUpdateInfoDto stateChange;
 }
