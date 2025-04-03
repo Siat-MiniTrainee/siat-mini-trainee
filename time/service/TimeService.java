@@ -16,12 +16,15 @@ public class TimeService {
         return instance;
     }
 
-    // Get the play time of a player by ID
+    public int createPlayerTime(int playerId, int initTime) {
+        return timeDao.insertPlayerTime(playerId, initTime);
+    }
+
     public int getPlayerTime(int playerId) {
         return timeDao.getPlayerTime(playerId);
     }
 
-    // Update the play time of a player by ID
+    
     public int updatePlayerTime(int playerId) {
         int playerTime = getPlayerTime(playerId);
         if(timeDao.updatePlayerTime(playerId, playerTime + 1)>0){
