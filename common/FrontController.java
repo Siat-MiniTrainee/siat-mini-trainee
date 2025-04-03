@@ -14,6 +14,7 @@ import quiz.model.domain.QuizDto;
 import quiz.model.domain.QuizResponseDto;
 import quiz.model.domain.QuizType;
 import shop.model.domain.ShopItemFilterDto;
+import state.controller.StateController;
 import state.model.domain.StateResponseDto;
 import state.model.domain.StateUpdateInfoDto;
 import state.model.domain.StateUpdateRequestDto;
@@ -30,6 +31,17 @@ public class FrontController {
     // 각 메서드는 일종의 인터페이스가 된다.
     // 급할시에는 상관없으나 충돌을 막기위해 임의의 메서드를 막 추가하는 일은 피한다.
     // 가장 기본적인 규칙은 가져오는 경우 get[해당도메인명]
+    
+        public List<StateResponseDto> getPlayerList() {
+        StateController stateController = (StateController) factory.getCtrl("state");
+        return stateController.getPlayerList();
+    }
+
+    public StateResponseDto createPlayer(String playerName) {
+        StateController stateController = (StateController) factory.getCtrl("state");
+        return stateController.createPlayer(playerName);
+    }
+
     public StateResponseDto getState(int playerId) {
         StateResponseDto dummy = StateResponseDto.builder()
             .playerId(playerId)
@@ -41,11 +53,14 @@ public class FrontController {
             .strength(15.0)
             .money(200.0)
             .build();
+        StateController stateController = (StateController) factory.getCtrl("state");
+        // return stateController.getState(playerId);
         return dummy;
     }
     
-    public int updateState(StateUpdateRequestDto request){
-        return 0;
+    public StateUpdateInfoDto updateState(StateUpdateRequestDto request) {
+        StateController stateController = (StateController) factory.getCtrl("state");
+        return stateController.updateState(request);
     }
     
     public ActionResponseDto doAction(int playerId, ActionType actionType) {
