@@ -1,10 +1,13 @@
 package action.service;
 
-import java.sql.SQLException;
+import java.util.Optional;
 
 import action.model.dao.ActionDao;
 import action.model.domain.ActionResponseDto;
 import action.model.domain.ActionType;
+import state.model.domain.StateResponseDto;
+import state.model.domain.StateUpdateInfoDto;
+import state.model.domain.StateUpdateRequestDto;
 import state.service.StateService;
 
 public class ActionService {
@@ -14,22 +17,11 @@ public class ActionService {
 
     private ActionService(){
         this.actionDao = ActionDao.getInstance();
+        this.stateService = StateService.getInstance();
     }
 
     public static ActionService getInstance() {
         return instance;
-    }
-
-    public void performAction(String actionType, int mentalDelta, int physicalDelta, int intelligenceDelta) throws SQLException {
-        // 각 상태별로 데이터베이스에서 현재 값을 가져옵니다.
-        int currentMental = actionDao.getStat("mental");
-        int currentPhysical = actionDao.getStat("physical");
-        int currentIntelligence = actionDao.getStat("intelligence");
-
-        // 상태 값을 업데이트합니다.
-        actionDao.updateStat("mental", currentMental + mentalDelta);
-        actionDao.updateStat("physical", currentPhysical + physicalDelta);
-        actionDao.updateStat("intelligence", currentIntelligence + intelligenceDelta);
     }
 
     public ActionResponseDto doAction(int playerId, ActionType actionType) {
@@ -37,74 +29,84 @@ public class ActionService {
         // 인 액션을 찾고 action_stat_change와 stat_change 테이블을 조인하여 해당 액션의 스텟변경 수치를 찾는다
         // 변경수치를 StateUpdateReqestDto에 담는다. State서비스의 updateState(playerId, updateDto) 함수를 호출한다(구현예정)
         // 서비스를 호출해서 변경에 성공하면 ActionResponseDto에 변경된 수치 정보를 StateUpdateInfoDto에 담고 결과 정보를 담아서 리턴한다.
-        actionDao.
-        return null;
+
+        Optional<StateResponseDto> playerStateResult = stateService.getState(playerId);
+        if (playerStateResult.isPresent()) {
+            StateResponseDto playerState = playerStateResult.get();
+            StateUpdateInfoDto updateInfo = actionDao.selectActionStatChanges(actionType);
+            switch (actionType) {
+                case EXERCISE:
+                case STUDY:
+                case REST:
+                    return commonAction(playerId, actionType, playerState, updateInfo);
+                case PART_TIME_JOB:
+                    if (playerState.getStrength() >= 10) {
+                        updateInfo.setMoney(updateInfo.getMoney()+updateInfo.getMoney()*playerState.getStrength()*0.2);
+                    }
+                    return commonAction(playerId, actionType, playerState, updateInfo);
+                default:
+                    break;
+            }
+        }
+        
+        //actionDao.
+        return ActionResponseDto.builder()
+        .result("실패")
+        .actionName(actionType.name())
+        .build();
     }
 
-    private void StudyAction() {
-        try {
-             actionService.performAction("STUDY", -3, -2, +1);
-             System.out.println("공부중입니다.. 정신력 -3, 체력 -2, 지능 +1");
-         } catch (SQLException e) {
-             e.printStackTrace();
-         }
-        
-     }
+    private ActionResponseDto commonAction(int playerId, ActionType actionType, StateResponseDto playerState,
+            StateUpdateInfoDto updateInfo) {
+        if (playerState.getHp() + updateInfo.getHp() <= 0) {
+            return ActionResponseDto.builder()
+                    .result("HP가 부족합니다.")
+                    .actionName(actionType.name())
+                    .stageChange(updateInfo)
+                    .build();
+        } else if (playerState.getMp() + updateInfo.getMp() <= 0) {
+            return ActionResponseDto.builder()
+                    .result("MP가 부족합니다.")
+                    .actionName(actionType.name())
+                    .stageChange(updateInfo)
+                    .build();
+        } else if (playerState.getMoney() + updateInfo.getMoney() < 0) {
+            return ActionResponseDto.builder()
+                    .result("돈이 부족합니다.")
+                    .actionName(actionType.name())
+                    .stageChange(updateInfo)
+                    .build();
+        }
+        Optional<StateUpdateInfoDto> stateUpdateResult= stateService.updateState(StateUpdateRequestDto.builder()
+                .playerId(playerId)
+                .hp(updateInfo.getHp())
+                .mp(updateInfo.getMp())
+                .intelligence(updateInfo.getIntelligence())
+                .strength(updateInfo.getStrength())
+                .money(updateInfo.getMoney())
+                .build());
+        if (stateUpdateResult.isPresent()) {
+            return ActionResponseDto.builder()
+            .result("성공")
+                    .actionName(actionType.name())
+                    .stageChange(updateInfo)
+            .build();
+        }
+        return ActionResponseDto.builder()
+        .result("실패")
+        .actionName(actionType.name())
+        .build();
+
+    }
  
-     private void ExerciseAction() {
-         try {
-             actionService.performAction("EXERCISE", -1, -1, 0);
-             System.out.println("운동중입니다.. 정신력 -1, 체력 -1");
-         } catch (SQLException e) {
-             e.printStackTrace();
-         }
-     }
- 
-     private void RestAction() {
-         try {
-             actionService.performAction("REST", +1, +1, 0);
-             System.out.println("휴식 중입니다.. 정신력 +5, 체력 +5");
-         } catch (SQLException e) {
-             e.printStackTrace();
-         }
-     }
      
-     public void Quiz1Action() {
-         try {
-             actionService.performAction("QUIZ1", 0, 0, +1);
-             System.out.println("퀴즈 중입니다.. 지능 +1");
-         } catch (SQLException e) {
-             e.printStackTrace();
-         }
-     }
- 
-     public void Quiz2Action() {
-         try {
-             actionService.performAction("QUIZ2", 0, 0, +1);
-             System.out.println("퀴즈 중입니다.. 지능 +1");
-         } catch (SQLException e) {
-             e.printStackTrace();
-         }
-     }
- 
-     public void Quiz3Action() {
-         try {
-             actionService.performAction("QUIZ3", 0, 0, +1);
-             System.out.println("퀴즈 중입니다.. 지능 +1");
-         } catch (SQLException e) {
-             e.printStackTrace();
-         }
-     }
- 
-     public void WorkAction() {
-         try {
-             actionService.performAction("PART_TIME_JOB", 0, -1, 0); 
-             System.out.println("아르바이트 중입니다.. 체력 -1");
-         } catch (SQLException e) {
-             e.printStackTrace();
-         }
-     
-     }    
+    //  public void QuizAction() {
+    //      try {
+
+    //      } catch (SQLException e) {
+    //          e.printStackTrace();
+    //      }
+    //  }
 
 
 }
