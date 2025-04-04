@@ -15,7 +15,9 @@ import quiz.model.domain.QuizConfirmResponseDto;
 import quiz.model.domain.QuizDto;
 import quiz.model.domain.QuizResponseDto;
 import quiz.model.domain.QuizType;
+import shop.controller.ShopController;
 import shop.model.domain.ShopItemFilterDto;
+import shop.model.domain.ShopItemSortDto;
 import state.controller.StateController;
 import state.model.domain.StateResponseDto;
 import state.model.domain.StateUpdateInfoDto;
@@ -82,7 +84,8 @@ public class FrontController {
     }
     
     public List<ItemInfoDto> getShopItemList(int playerId) {
-        return null;
+        ShopController shopController = (ShopController) factory.getCtrl("shop");
+        return shopController.getItems(playerId);
     }
     
     public int updateTime(int playerId) {
@@ -90,16 +93,14 @@ public class FrontController {
         return timeController.updateTime(playerId);
     }
     
-    public List<ItemInfoDto> getShopOrderList(int playerId, ShopItemFilterDto filterCriteria) {
-    
-    List<ItemInfoDto> shopItems = new ArrayList<>();
-
-
-    return shopItems;
+    public List<ItemInfoDto> getShopOrderList(int playerId, ShopItemSortDto itemSortDto) {
+        ShopController shopController = (ShopController) factory.getCtrl("shop");
+        return shopController.getShopOrderList(playerId, null, itemSortDto);
     }
     
-    public List<ItemInfoDto> getShopFilterList(int playerId){
-        return null;
+    public List<ItemInfoDto> getShopFilterList(int playerId, ShopItemFilterDto itemFilterDto){
+        ShopController shopController = (ShopController) factory.getCtrl("shop");
+        return shopController.getFilteredItems(playerId, itemFilterDto);
     }
     
     public String buyItem(int playerId, int itemId){
