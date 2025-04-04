@@ -19,8 +19,9 @@ public class StateDao {
     private String PLAYER_DETAIL_TABLE_NAME = "player_detail";
 
     private JDBCUtil db;
+
     private StateDao() {
-        db= JDBCUtil.getInstance();
+        db = JDBCUtil.getInstance();
     }
 
     public static StateDao getInstance() {

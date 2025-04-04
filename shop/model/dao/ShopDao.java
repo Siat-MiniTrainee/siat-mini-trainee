@@ -24,22 +24,23 @@ public class ShopDao {
         return instance;
     }
 
-    // 단순히 모든 아이템 정보를 가져오는 메소드
     public List<ItemInfoDto> getAllItems() {
         List<ItemInfoDto> items = new ArrayList<>();
-        String sql = "SELECT id, name, category_id, item_type, description, cost FROM item";
+        String sql = "SELECT item_id, item_name, category_name, type_name, ITEM_DESCRIPTION , cost FROM item i"+
+        " JOIN item_category ic on i.category_id= ic.category_id"+
+        " JOIN item_type it on i.item_type=it.item_type";
         try (Connection con = db.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                ItemCategory category = ItemCategory.valueOf(rs.getString("category_id"));
-                ItemType type = ItemType.valueOf(rs.getString("item_type"));
+                ItemCategory category = ItemCategory.valueOf(rs.getString("category_name").toUpperCase());
+                ItemType type = ItemType.valueOf(rs.getString("type_name").toUpperCase());
                 ItemInfoDto item = ItemInfoDto.builder()
-                    .id(rs.getInt("id"))
-                    .name(rs.getString("name"))
+                    .id(rs.getInt("item_id"))
+                    .name(rs.getString("item_name"))
                     .category(category)
                     .type(type)
-                    .description(rs.getString("description"))
+                    .description(rs.getString("ITEM_DESCRIPTION"))
                     .cost(rs.getDouble("cost"))
                     .build();
                 items.add(item);
