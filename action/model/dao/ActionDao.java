@@ -36,8 +36,8 @@ public class ActionDao {
             conn = db.getConnection();
     
             String sql = "SELECT " +
-                         "  a.ACTION_ID, " +
-                         "  a.ACTION_NAME, " +
+                         "  a.ACTION_ID AS ACTION_ID, " +
+                         "  a.ACTION_NAME AS ACTION_NAME, " +
                          "  MAX(CASE WHEN s.STAT_NAME = 'HP' THEN sc2.CHANGE_VALUE END) AS HP, " +
                          "  MAX(CASE WHEN s.STAT_NAME = 'MP' THEN sc2.CHANGE_VALUE END) AS MP, " +
                          "  MAX(CASE WHEN s.STAT_NAME = 'INT' THEN sc2.CHANGE_VALUE END) AS INT, " +
@@ -152,7 +152,7 @@ public class ActionDao {
                          "JOIN ACTION_STAT_CHANGE sc1 ON a.ACTION_ID = sc1.ACTION_ID " + //
                          "JOIN STAT_CHANGE sc2 ON sc1.CHANGE_ID = sc2.CHANGE_ID " + //
                          "JOIN STAT s ON s.STAT_ID = sc2.STAT_ID " + //
-                         "WHERE a.ACTION_TYPE = ? " + //
+                         "WHERE a.ACTION_NAME = ? " + //
                          "GROUP BY a.ACTION_ID, a.ACTION_NAME";
     
             pstmt = conn.prepareStatement(sql);

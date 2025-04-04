@@ -90,6 +90,7 @@ public class QuizService {
             Optional<StateResponseDto> playerStateResult = stateService.getState(playerId);
             if (playerStateResult.isPresent()) {
                 Optional<StateUpdateInfoDto> updateResult = stateService.updateState(StateUpdateRequestDto.builder()
+                .playerId(playerId)
                 .hp(updateInfo.getHp())
                 .mp(updateInfo.getMp())
                 .intelligence(updateInfo.getIntelligence())
@@ -103,7 +104,6 @@ public class QuizService {
                         .stateChange(updateResult.get())
                         .build();
                 }
-                
             }
         } else {
             Optional<StateUpdateInfoDto> updateResult = stateService.updateState(StateUpdateRequestDto.builder()

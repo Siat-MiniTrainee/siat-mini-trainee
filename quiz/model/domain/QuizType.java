@@ -3,7 +3,7 @@ package quiz.model.domain;
 public enum QuizType {
     HTML,
     CSS,
-    JAVASCRIPT,
+    JAVA_SCRIPT,
     DB,
     JDBC,
     PYTHON,
