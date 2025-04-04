@@ -76,6 +76,7 @@ public class TimeDao {
         try {
             conn = db.getConnection();
             pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(idx++, newTime);
             pstmt.setInt(idx++, playerId);
             result = pstmt.executeUpdate();
 
