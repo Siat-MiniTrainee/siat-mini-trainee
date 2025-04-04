@@ -31,6 +31,22 @@ public class StateService {
        
         return  stateDao.selectPlayerAllState();
     }
+    public double calculateScore(int playerId) {
+        double score = 0.0;
+        Optional<StateResponseDto> stateInfo = stateDao.selectPlayerOneState(playerId);
+        if(stateInfo.isPresent()){
+            StateResponseDto state =stateInfo.get();
+        
+        score += state.getIntelligence()*4.0;    // INT는 가중치 2배
+        score += state.getStrength()*2.0;
+        score += state.getHp()*1.5;
+        score += state.getMp()*1.5;
+        score += state.getMoney() / 100.0;
+        stateDao.updatePlayerDetailScore(playerId, score);
+        return score;
+        }
+        return -1;
+    }
     public Optional<StateResponseDto> createPlayer(String playerName) {
         
         StateResponseDto newPlayer = StateResponseDto.builder()
@@ -39,9 +55,9 @@ public class StateService {
                 .maxMp(100)
                 .hp(100) 
                 .mp(100)
-                .intelligence(0)
-                .strength(0)
-                .money(0)
+                .intelligence(5)
+                .strength(5)
+                .money(500)
                 .build();
         
         // 데이터베이스에 새 플레이어 기록을 삽입
@@ -90,6 +106,12 @@ public class StateService {
     }
     public StateUpdateInfoDto applyInventoryItem(StateUpdateRequestDto updateRequestDto){
         List<ItemInfoDto> passiveItemList = new ArrayList<>();
-        return StateUpdateInfoDto.builder().build();
+        return StateUpdateInfoDto.builder()
+        .hp(updateRequestDto.getHp())
+        .mp(updateRequestDto.getMp())
+        .intelligence(updateRequestDto.getIntelligence())
+        .strength(updateRequestDto.getStrength())
+        .money(updateRequestDto.getMoney())
+        .build();
     }
 }
