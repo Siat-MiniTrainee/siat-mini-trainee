@@ -10,7 +10,8 @@ import lombok.ToString;
 @Builder
 @ToString
 public class StateResponseDto {
-    private double playerId;
+    private int playerId;
+    private String playerName;
     private double hp;
     private double mp;
     private double maxHp;
