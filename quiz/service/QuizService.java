@@ -50,12 +50,12 @@ public class QuizService {
         }
         if (difficulty == 2) {
             finalQuizList.addAll(getRandomSubset(level1Quizzes, Math.max((int) (5 * 0.3),1))); // 30%
-            finalQuizList.addAll(getRandomSubset(level2Quizzes, Math.max((int) (5 * 0.4),1))); // 40%
-            finalQuizList.addAll(getRandomSubset(level3Quizzes, Math.max((int) (5 * 0.3),1))); // 30%
+            finalQuizList.addAll(getRandomSubset(level2Quizzes, Math.max((int) (5 * 0.4),3))); // 40%
+            finalQuizList.addAll(getRandomSubset(level3Quizzes, Math.max((int) (5 * 0.3),2))); // 30%
         } else if (difficulty == 3) {
-            finalQuizList.addAll(getRandomSubset(level1Quizzes, Math.max((int) (8 * 0.1),1))); // 10%
-            finalQuizList.addAll(getRandomSubset(level2Quizzes, Math.max((int) (8 * 0.4),1))); // 40%
-            finalQuizList.addAll(getRandomSubset(level3Quizzes, Math.max((int) (8 * 0.5),1))); // 50%
+            finalQuizList.addAll(getRandomSubset(level1Quizzes, Math.max((int) (8 * 0.1),2))); // 10%
+            finalQuizList.addAll(getRandomSubset(level2Quizzes, Math.max((int) (8 * 0.4),4))); // 40%
+            finalQuizList.addAll(getRandomSubset(level3Quizzes, Math.max((int) (8 * 0.5),4))); // 50%
         }
 
         Collections.shuffle(finalQuizList);
@@ -106,15 +106,19 @@ public class QuizService {
                 }
             }
         } else {
-            Optional<StateUpdateInfoDto> updateResult = stateService.updateState(StateUpdateRequestDto.builder()
-                    .hp(updateInfo.getHp())
-                    .mp(updateInfo.getMp())
-                    .build());
-            if (updateResult.isPresent()) {
-                return QuizResponseDto.builder()
+            Optional<StateResponseDto> playerStateResult = stateService.getState(playerId);
+            if (playerStateResult.isPresent()) {
+                Optional<StateUpdateInfoDto> updateResult = stateService.updateState(StateUpdateRequestDto.builder()
+                .playerId(playerId)
+                .hp(updateInfo.getHp())
+                .mp(updateInfo.getMp())
+                        .build());
+                if (updateResult.isPresent()) {
+                    return QuizResponseDto.builder()
                         .result("성공")
-                        .stateChange(StateUpdateInfoDto.builder().build())
+                        .stateChange(updateResult.get())
                         .build();
+                }
             }
         }
         return QuizResponseDto.builder()
