@@ -16,7 +16,7 @@ import state.model.domain.StateUpdateRequestDto;
 public class StateDao {
     private static volatile StateDao instance = new StateDao();
     private String PLAYER_TABLE_NAME = "PLAYER";
-    private String PLAYER_DETAIL_TABLE_NAME = "player_detail";
+    private String PLAYER_DETAIL_TABLE_NAME = "PLAYER_DETAIL";
 
     private JDBCUtil db;
     private StateDao() {
@@ -29,46 +29,55 @@ public class StateDao {
     public int insertPlayer(StateResponseDto player) {
         Connection conn = null;
         PreparedStatement pstmt = null;
-        ResultSet generatedKeys = null;
-        String sql = "INSERT INTO " + PLAYER_TABLE_NAME + " (player_id, player_name, max_mp, max_hp, hp, mp, int, str, money) "
-                   + "VALUES ("+PLAYER_TABLE_NAME+"_SEQ.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?)";
-        int idx=1;
-        int result = 0;
-        int playerId=-1;
+        ResultSet rs = null;
+        int playerId = -1;
+        String selectSeqSql = "SELECT " + PLAYER_TABLE_NAME + "_SEQ.NEXTVAL FROM DUAL";
+        String insertSql = "INSERT INTO " + PLAYER_TABLE_NAME + " (player_id, player_name, max_mp, max_hp, hp, mp, int, str, money) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try {
             conn = db.getConnection();
-            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-    
-            pstmt.setString(idx++, player.getPlayerName());
-            pstmt.setDouble(idx++, player.getMaxMp());
-            pstmt.setDouble(idx++, player.getMaxHp());
-            pstmt.setDouble(idx++, player.getHp());
-            pstmt.setDouble(idx++, player.getMp());
-            pstmt.setDouble(idx++, player.getIntelligence());
-            pstmt.setDouble(idx++, player.getStrength());
-            pstmt.setDouble(idx++, player.getMoney());
-    
-            result = pstmt.executeUpdate();
-            if(result>0){
-                generatedKeys =pstmt.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    playerId = generatedKeys.getInt(1);
-                }
+
+            // Step 1: Get the next value of the sequence
+            pstmt = conn.prepareStatement(selectSeqSql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                playerId = rs.getInt(1);
             }
-    
+            db.close(rs, pstmt);
+
+            if (playerId != -1) {
+                // Step 2: Use the sequence value to insert the record
+                pstmt = conn.prepareStatement(insertSql);
+
+                int idx = 1;
+                pstmt.setInt(idx++, playerId);
+                pstmt.setString(idx++, player.getPlayerName());
+                pstmt.setDouble(idx++, player.getMaxMp());
+                pstmt.setDouble(idx++, player.getMaxHp());
+                pstmt.setDouble(idx++, player.getHp());
+                pstmt.setDouble(idx++, player.getMp());
+                pstmt.setDouble(idx++, player.getIntelligence());
+                pstmt.setDouble(idx++, player.getStrength());
+                pstmt.setDouble(idx++, player.getMoney());
+
+                pstmt.executeUpdate();
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            db.close(rs);
             db.close(pstmt, conn);
         }
-    
+
         return playerId;
     }
     public int insertPlayerDetail(StateResponseDto player) {
         Connection conn = null;
         PreparedStatement pstmt = null;
-        String sql = "INSERT INTO "+PLAYER_DETAIL_TABLE_NAME+" ("+PLAYER_DETAIL_TABLE_NAME+"_SEQ.NEXTVAL, player_id, player_name, score) "
-                   + "VALUES ( ?, ?, ?)";
+        String sql = "INSERT INTO "+PLAYER_DETAIL_TABLE_NAME+" (player_detail_id, player_id, player_name, score) "
+                   + "VALUES ("+PLAYER_DETAIL_TABLE_NAME+"_SEQ.NEXTVAL, ?, ?, ?)";
         int idx=1;
         int result = 0;
         try {
@@ -89,6 +98,31 @@ public class StateDao {
     
         return result;
     }
+    public int updatePlayerDetailScore(int playerId, double score) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        String sql = "UPDATE " + PLAYER_DETAIL_TABLE_NAME + " SET score = ? WHERE player_id = ?";
+        
+        int result = 0;
+        try {
+            conn = db.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            
+            int idx = 1;
+            pstmt.setDouble(idx++, score);
+            pstmt.setInt(idx++, playerId);
+            
+            result = pstmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            db.close(pstmt, conn);
+        }
+        
+        return result;
+    }
+
     public int updatePlayerState(StateUpdateRequestDto updatedState) {
         Connection conn = null;
         PreparedStatement pstmt = null;

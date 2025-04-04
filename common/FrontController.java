@@ -46,19 +46,12 @@ public class FrontController {
     }
 
     public StateResponseDto getState(int playerId) {
-        StateResponseDto dummy = StateResponseDto.builder()
-            .playerId(playerId)
-            .hp(100.0)
-            .mp(50.0)
-            .maxHp(100.0)
-            .maxMp(50.0)
-            .intelligence(10.0)
-            .strength(15.0)
-            .money(200.0)
-            .build();
         StateController stateController = (StateController) factory.getCtrl("state");
-        // return stateController.getState(playerId);
-        return dummy;
+        return stateController.getState(playerId);
+    }
+    public double getScore(int playerId){
+        StateController stateController = (StateController) factory.getCtrl("state");
+        return stateController.getScore(playerId);
     }
     
     public StateUpdateInfoDto updateState(StateUpdateRequestDto request) {

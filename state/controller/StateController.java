@@ -18,6 +18,9 @@ public class StateController {
     public StateResponseDto getState(int playerId) {
         return stateService.getState(playerId).orElse(StateResponseDto.builder().build());
     }
+    public double getScore(int playerId){
+        return stateService.calculateScore(playerId);
+    }
 
     public StateUpdateInfoDto updateState(StateUpdateRequestDto updatedState) {
         return stateService.updateState(updatedState).orElse(StateUpdateInfoDto.builder().build());

@@ -24,6 +24,16 @@ public class ActionService {
         return instance;
     }
 
+    private String canAction(StateResponseDto playerState, StateUpdateInfoDto updateInfo) {
+        if (playerState.getHp() + updateInfo.getHp() <= 0) {
+            return "HP가 부족합니다.";
+        } else if (playerState.getMp() + updateInfo.getMp() <= 0) {
+            return "MP가 부족합니다.";
+        } else if (playerState.getMoney() + updateInfo.getMoney() < 0) {
+            return "돈이 부족합니다.";
+        }
+        return null; // 모든 조건을 만족하는 경우 null 반환
+    }
     public ActionResponseDto doAction(int playerId, ActionType actionType) {
         // actionDao에서 해당 action(문자열 from action where action_name = actionType)
         // 인 액션을 찾고 action_stat_change와 stat_change 테이블을 조인하여 해당 액션의 스텟변경 수치를 찾는다
@@ -44,6 +54,10 @@ public class ActionService {
                         updateInfo.setMoney(updateInfo.getMoney()+updateInfo.getMoney()*playerState.getStrength()*0.2);
                     }
                     return commonAction(playerId, actionType, playerState, updateInfo);
+                case QUIZ1:
+                case QUIZ2:
+                case QUIZ3:
+                    return quizAction(playerId, actionType, playerState, updateInfo);
                 default:
                     break;
             }
@@ -55,28 +69,21 @@ public class ActionService {
         .actionName(actionType.name())
         .build();
     }
+    
 
     private ActionResponseDto commonAction(int playerId, ActionType actionType, StateResponseDto playerState,
             StateUpdateInfoDto updateInfo) {
-        if (playerState.getHp() + updateInfo.getHp() <= 0) {
-            return ActionResponseDto.builder()
-                    .result("HP가 부족합니다.")
-                    .actionName(actionType.name())
-                    .stageChange(updateInfo)
-                    .build();
-        } else if (playerState.getMp() + updateInfo.getMp() <= 0) {
-            return ActionResponseDto.builder()
-                    .result("MP가 부족합니다.")
-                    .actionName(actionType.name())
-                    .stageChange(updateInfo)
-                    .build();
-        } else if (playerState.getMoney() + updateInfo.getMoney() < 0) {
-            return ActionResponseDto.builder()
-                    .result("돈이 부족합니다.")
-                    .actionName(actionType.name())
-                    .stageChange(updateInfo)
-                    .build();
+        if(!ActionType.REST.equals(actionType)){
+            String canActionResult = canAction(playerState, updateInfo);
+            if(canActionResult!=null){
+                return ActionResponseDto.builder()
+                .result(canActionResult)
+                .actionName(actionType.name())
+                .stageChange(updateInfo)
+                .build();
+            }
         }
+        
         Optional<StateUpdateInfoDto> stateUpdateResult= stateService.updateState(StateUpdateRequestDto.builder()
                 .playerId(playerId)
                 .hp(updateInfo.getHp())
@@ -100,13 +107,22 @@ public class ActionService {
     }
  
      
-    //  public void QuizAction() {
-    //      try {
-
-    //      } catch (SQLException e) {
-    //          e.printStackTrace();
-    //      }
-    //  }
+     public ActionResponseDto quizAction(int playerId, ActionType actionType, StateResponseDto playerState,
+     StateUpdateInfoDto updateInfo) {
+        String canActionResult = canAction(playerState, updateInfo);
+            if(canActionResult!=null){
+                return ActionResponseDto.builder()
+                .result(canActionResult)
+                .actionName(actionType.name())
+                .stageChange(updateInfo)
+                .build();
+            }
+            return ActionResponseDto.builder()
+            .result("성공")
+                    .actionName(actionType.name())
+                    .stageChange(updateInfo)
+            .build();
+     }
 
 
 }
