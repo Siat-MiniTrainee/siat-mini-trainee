@@ -138,7 +138,7 @@ public class QuizDao {
                 "q.answer, " +
                 "q.explain AS explanation, " +
                 "qt.quiz_type_name AS quiz_type, " +
-                "q.quiz_level AS level " +
+                "q.quiz_level AS quiz_level " +
                 "FROM quiz q " +
                 "JOIN quiz_type qt ON q.quiz_type_id = qt.quiz_type_id " +
                 "WHERE q.quiz_id = ?";
@@ -155,7 +155,7 @@ public class QuizDao {
                 .explanation(rset.getString("explanation"))
                 .answer(rset.getString("answer"))
                 .quizType(QuizType.valueOf(rset.getString("quiz_type").toUpperCase()))
-                .level(rset.getInt("level"))
+                .level(rset.getInt("quiz_level"))
                 .build();
                 result = Optional.of(quiz);
             }
