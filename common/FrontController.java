@@ -116,6 +116,7 @@ public class FrontController {
             .strength(3)
             .build();
         return ItemUseDto.builder()
+        .itemId(1)
         .itemName("빵")
         .result("성공")
         .statChange(stateChange)
@@ -125,8 +126,9 @@ public class FrontController {
     public List<InventoryItemDto> getInventoryInfo(int playerId){
         List<InventoryItemDto> list = new ArrayList<>();
         list.add(InventoryItemDto.builder()
-        .count(1)
-        .itemId(1)
+        .count(5)
+        .itemId(2)
+        .invenId("2")
         .itemName("빵")
         .build());
         return list;

@@ -28,8 +28,8 @@ public class TraineeView {
     }
 
     public void exec () {
-        playerName = inputbox("캐릭터 생성", "이름을 입력하세요.");
-        fc.updateState(null);
+
+        initMenu();
 
         while (true) {
             int userChoice = mainMenu();
@@ -65,6 +65,46 @@ public class TraineeView {
         }
     }
 
+    public void initMenu() {
+        while (true) {
+            List<StateResponseDto> charList = fc.getPlayerList();
+
+            clear();
+            printBanner("캐릭터를 선택하세요.");
+    
+            System.out.println("0. 새로운 캐릭터 생성");
+            margin();
+
+            if(charList.size() > 0) {
+                for (StateResponseDto c : charList) {
+                    System.out.println(c.getPlayerId() +". "+ c.getPlayerName()+
+                                        "    \t소지금:   "+c.getMoney()
+                                        );
+                }
+            }
+            int userChoice = inputInt();
+            if (userChoice == 0) {
+                playerName = inputbox("캐릭터 생성", "이름을 입력하세요.");
+                playerId = fc.createPlayer(playerName).getPlayerId();
+                return;
+            }
+            else {
+                StateResponseDto result = fc.getState(userChoice);
+
+                // System.out.println(result);
+
+                if (result.getPlayerId() == 0) {
+                    continue;
+                }
+                else {
+                    playerId = result.getPlayerId();
+                    playerName = result.getPlayerName();
+                    return;
+                }
+            }
+        }
+    }
+
     public void shopLoop() {
 
         while (true) {
@@ -76,15 +116,17 @@ public class TraineeView {
             margin();
             System.out.println("[ 아이템 목록 ]");
             margin();
+            printShopItems();
+            margin();
             System.out.println("  0. 뒤로");
 
             int userChoice = inputInt();
-            switch (userChoice) {
-                case 0:
-                    return;
-            
-                default:
-                    break;
+            if (userChoice == 0) {
+                return;
+            }
+            else {
+                String result = fc.buyItem(playerId, userChoice);
+                messagebox("알림", result);
             }
         }
     }
@@ -135,7 +177,7 @@ public class TraineeView {
 
     public void studyMenu() {
         int userChoice = ynMessagebox("공부", 
-            "정신력이 50 감소하며 지능이 5 상승합니다.\n"+
+            "정신력과 체력을 사용하여 공부합니다. 지능이 상승합니다.\n"+
             "공부하시겠습니까? (Y/N)\r",
             1);
 
@@ -153,6 +195,7 @@ public class TraineeView {
 
     public void exerciseMenu() {
         int userChoice = ynMessagebox("운동", 
+        "체력과 정신력을 사용하여 운동합니다. 힘이 증가합니다.\n"+
         "운동하시겠습니까? (Y/N)\r",
         2);
         if (userChoice == 1) {
@@ -169,6 +212,7 @@ public class TraineeView {
 
     public void restMenu() {
         int userChoice = ynMessagebox("휴식", 
+        "체력과 정신력을 어느정도 회복합니다."+
         "휴식하시겠습니까? (Y/N)\r",
         3);
         if (userChoice == 1) {
@@ -184,7 +228,9 @@ public class TraineeView {
     }
 
     public void workMenu() {
-        int userChoice = ynMessagebox("알바", 
+        int userChoice = ynMessagebox("아르바이트",
+        "정신력과 정신력을 사용하여 아르바이트를 뜁니다."+
+        "힘이 소폭 증가하고 돈을 법니다.\n"+ 
         "알바하시겠습니까? (Y/N)\r");
 
         if (userChoice == 1) {
@@ -208,11 +254,11 @@ public class TraineeView {
         margin();
         System.out.println("[ 퀴즈 종류 ]");
         margin();
-        System.out.println("  1. 프로그래밍 언어 5문제 [보통]");
+        System.out.println("  1. 파이썬 5문제 [보통]");
         margin();
-        System.out.println("  2. 프론트엔드 5문제 [보통]");
+        System.out.println("  2. 자바 5문제 [보통]");
         margin();
-        System.out.println("  3. 종합 시험 8문제 [매우 어려움]");
+        System.out.println("  3. 종합 시험 8문제 [어려움]");
         margin();
         System.out.println("  0. 뒤로");
         int userChoice = inputInt();
@@ -222,10 +268,10 @@ public class TraineeView {
                 quizLoop(2, QuizType.PYTHON, 5);
                 break;
             case 2:
-                quizLoop(2, QuizType.HTML, 5);
+                quizLoop(2, QuizType.JAVA, 5);
                 break;
             case 3:
-                quizLoop(2, QuizType.ALL, 8);
+                quizLoop(3, QuizType.ALL, 8);
                 break;
             default:
                 break;
@@ -233,36 +279,68 @@ public class TraineeView {
     }
 
     public void quizLoop(int difficulty, QuizType qt, int size) {
+        ActionResponseDto response= ActionResponseDto.builder().build();
+        switch (difficulty) {
+            case 1:
+            response = fc.doAction(playerId, ActionType.QUIZ1);
+        if (!response.getResult().equals("Action Successful")) {
+            messagebox("실패!", "퀴즈를 풀수 없습니다... "+response.getResult());
+            return;
+        }
+            case 2:
+            response = fc.doAction(playerId, ActionType.QUIZ2);
+        if (!response.getResult().equals("Action Successful")) {
+            messagebox("실패!", "퀴즈를 풀수 없습니다... "+response.getResult());
+            return;
+        }
+            case 3:
+            response = fc.doAction(playerId, ActionType.QUIZ3);
+        if (!response.getResult().equals("Action Successful")) {
+            messagebox("실패!", "퀴즈를 풀수 없습니다... "+response.getResult());
+            return;
+        }
+                
+                break;
+        
+            default:
+                break;
+        }
+        if (!response.getResult().equals("Action Successful")) {
+            messagebox("실패!", "퀴즈를 풀수 없습니다... "+response.getResult());
+            return;
+        }
 
-        fc.doAction(playerId, ActionType.QUIZ1);
         // Assume getQuizInfoList returns a list of quizzes
         List<QuizDto> quizzes = fc.getQuizInfoList(difficulty, qt);
 
         int correctAnswers = 0;
+        int quizCount = 1;
         
         for (QuizDto quiz : quizzes) {
             clear();
-            divider();
+            printBanner(quizCount + "번 문제");
             System.out.println(quiz.getContent()); // Display the question
 
             String userAnswer = inputString(); // Get user input
 
             QuizConfirmResponseDto result = fc.confirmQuiz(quiz.getQuizId(), userAnswer);
-            if (result.getResult().equals("정답")) { // Check answer
+            if (result.getResult().equals("성공")) { // Check answer
                 correctAnswers++;
-                quizConfirmBox("정답!", quiz.getExplanation());
+                quizConfirmBox("정답!", result.getExplanation());
             } else {
-                quizConfirmBox("오답!", quiz.getExplanation());
+                quizConfirmBox("오답!", result.getExplanation());
             }
+            quizCount++;
         }
 
         // Calculate the pass/fail condition.
         if (correctAnswers >= size / 2) {
             messagebox("Quiz Result", "Congratulations! You passed the quiz with " + correctAnswers + " correct answers.");
+            fc.submitQuizResult(playerId, difficulty, "성공");
         } else {
             messagebox("Quiz Result", "You failed the quiz with only " + correctAnswers + " correct answers.");
+            fc.submitQuizResult(playerId, difficulty, "실패");
         }
-        fc.submitQuizResult(playerId, difficulty);
         fc.updateTime(playerId);
     }
 
@@ -277,21 +355,23 @@ public class TraineeView {
         margin();
         printActions();
         margin();
+        System.out.println(AsciiArts.artChar);
         return inputInt();
     }
 
-    public void margin (int size) {
-        for (int i=0; i < size; i++ ) {
-            System.out.println();
-        }
-    }
+
 
     public void clear() {
-        System.out.print("\033[H\033[2J");
+        // System.out.print("\033[H\033[2J");
         System.out.flush();
     }
     public void margin () {
         margin(1);
+    }
+    public void margin (int size) {
+        for (int i=0; i < size; i++ ) {
+            System.out.println();
+        }
     }
 
     public int ynMessagebox(String title, String content, int ascii) {
@@ -326,8 +406,23 @@ public class TraineeView {
         return ynMessagebox(title, content, 0);
     }
 
+    public void printShopItems() {
+        List<ItemInfoDto> items = fc.getShopItemList(playerId);
+        if (items == null) {
+            System.out.println("아무것도 없음!");
+            return;
+        }
+        for (ItemInfoDto item : items) {
+            printItem(item);
+        }
+    }
+
     public void printInventoryItems() {
         List<InventoryItemDto> items = fc.getInventoryInfo(playerId);
+        if (items == null) {
+            System.out.println("아무것도 없음!");
+            return;
+        }
         for (InventoryItemDto item : items) {
             printItem(item);
         }
@@ -353,28 +448,25 @@ public class TraineeView {
 
     public String getCurrentTime() {
         int rawTime = fc.getTime(playerId);
-        int day = (int)rawTime / 4;
+        int day = (int)rawTime / 4 ;
         String time = "황혼";
         switch (rawTime % 4) {
             case 0:
-                time = "밤";
+                time = "아침"; 
                 break;
             case 1:
-                time = "저녁"; 
-                break;
-            case 2:
                 time = "점심";
                 break;
-            case 3:
-                time = "아침";
+            case 2:
+                time = "저녁";
                 break;
+            case 3:
+                time = "밤";
             default:
                 break;
         }
-        return "DAY : "+day+" - "+time;
+        return "DAY : "+(day + 1)+" - "+time;
     }
-
-
     
     public void quizConfirmBox(String title, String content) {
         clear();
@@ -441,9 +533,7 @@ public class TraineeView {
 
     public void printStats() {
 
-        StateResponseDto state = fc.getState(0);
-
-        int temp = 0;
+        StateResponseDto state = fc.getState(playerId);
         System.out.println("[ "+playerName+" ]");
         margin();
         System.out.println("  체  력 : "+ state.getHp());
@@ -473,7 +563,7 @@ public class TraineeView {
         return;
     }
     public void inputEnter() {
-        inputEnter("엔터를 눌러 메인 메뉴로 이동.");
+        inputEnter("엔터를 누르세요.");
     }
 
     public void inputEnter(String text) {

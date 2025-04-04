@@ -46,4 +46,13 @@ public class AsciiArts {
      \\_/\\_\\
     """;
 
+    public static final String artChar = """
+       @@@@@
+       (^. ^)    << 안녕!
+       /|  |\\
+      /_|__|_\\
+        /  \\
+       |_||_|
+       """;
+
 }
